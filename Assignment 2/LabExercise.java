@@ -8,9 +8,11 @@ public class LabExercise {
         // Method 1: Using indexOf
         int count1 = 0;
         int index = 0;
-        while ((index = sentence.indexOf(word, index)) != -1) {
+        index = sentence.indexOf(word, index); // Find first occurrence
+        while (index != -1) {
             count1++;
             index += word.length();
+            index = sentence.indexOf(word, index); // Find next occurrence
         }
         System.out.println("Method 1 (indexOf): " + count1);
         
@@ -29,12 +31,18 @@ public class LabExercise {
             }
         }
         
-        // Split IP address
+        // Split IP address with regex checking
         String ipAddress = "192.168.1.1";
+        // Simple regex for IPv4 address
+        String ipRegex = "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$";
         System.out.println("\nIP Address parts:");
-        String[] ipParts = ipAddress.split("\\.");
-        for (String part : ipParts) {
-            System.out.println(part);
+        if (ipAddress.matches(ipRegex)) {
+            String[] ipParts = ipAddress.split("\\.");
+            for (String part : ipParts) {
+                System.out.println(part);
+            }
+        } else {
+            System.out.println("Invalid IP address format.");
         }
     }
 }
