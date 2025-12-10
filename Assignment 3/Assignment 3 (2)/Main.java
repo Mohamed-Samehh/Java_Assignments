@@ -3,264 +3,205 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 
 /**
- * Main class - Entry point of the application
+ * Simple Student Registration System
  * Demonstrates StringTokenizer and autoboxing/unboxing
  */
 public class Main {
-    // Data storage
-    private static ArrayList<Student> students = new ArrayList<>();
-    private static ArrayList<Course> courses = new ArrayList<>();
-    private static Scanner scanner = new Scanner(System.in);
+    static ArrayList<Student> students = new ArrayList<>();
+    static ArrayList<Course> courses = new ArrayList<>();
+    static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        // Initialize some courses
-        initializeCourses();
-        
-        System.out.println("Welcome to Student Registration System!");
-        
-        int choice;
-        do {
-            printMenu();
-            choice = getIntInput();
-            
-            switch (choice) {
-                case 1:
-                    addStudent();
-                    break;
-                case 2:
-                    registerForCourses();
-                    break;
-                case 3:
-                    printStudentReport();
-                    break;
-                case 4:
-                    listAllCourses();
-                    break;
-                case 5:
-                    listAllStudents();
-                    break;
-                case 6:
-                    System.out.println("\nThank you for using the system. Goodbye!");
-                    break;
-                default:
-                    System.out.println("Invalid choice! Please try again.");
+        loadCourses();
+        System.out.println("Welcome to Student Registration System!\n");
+
+        while (true) {
+            showMenu();
+            int choice = getInt();
+
+            if (choice == 1)
+                addStudent();
+            else if (choice == 2)
+                registerForCourses();
+            else if (choice == 3)
+                printStudentReport();
+            else if (choice == 4)
+                listAllCourses();
+            else if (choice == 5)
+                listAllStudents();
+            else if (choice == 6) {
+                System.out.println("\nGoodbye!");
+                break;
+            } else {
+                System.out.println("Invalid choice! Try again.");
             }
-        } while (choice != 6);
-        
+        }
         scanner.close();
     }
 
-    // Display menu
-    private static void printMenu() {
-        System.out.println("\n===== MAIN MENU =====");
+    static void showMenu() {
+        System.out.println("\n===== MENU =====");
         System.out.println("1. Add Student");
         System.out.println("2. Register for Courses");
         System.out.println("3. Print Student Report");
         System.out.println("4. List All Courses");
         System.out.println("5. List All Students");
         System.out.println("6. Exit");
-        System.out.print("Enter your choice: ");
+        System.out.print("Choice: ");
     }
 
-    // Initialize default courses
-    private static void initializeCourses() {
-        // Autoboxing: int values automatically converted to Integer
+    static void loadCourses() {
         courses.add(new Course(101, "OOP", 3));
         courses.add(new Course(102, "Databases", 4));
         courses.add(new Course(103, "Data Structures", 3));
         courses.add(new Course(104, "Web Development", 3));
         courses.add(new Course(105, "Algorithms", 4));
-        
-        System.out.println("5 courses loaded into the system.");
+        System.out.println("5 courses loaded.");
     }
 
-    // Add a new student
-    private static void addStudent() {
-        System.out.println("\n--- Add New Student ---");
-        
-        System.out.print("Enter Student ID: ");
-        int id = getIntInput();  // primitive int
-        
-        // Check if ID already exists
-        if (findStudentById(id) != null) {
-            System.out.println("Error: Student ID already exists!");
+    static void addStudent() {
+        System.out.println("\n--- Add Student ---");
+        System.out.print("Student ID: ");
+        int id = getInt();
+
+        if (findStudent(id) != null) {
+            System.out.println("Error: ID already exists!");
             return;
         }
-        
-        System.out.print("Enter Student Name: ");
+
+        System.out.print("Student Name: ");
         String name = scanner.nextLine();
-        
-        // Autoboxing: int -> Integer when passing to constructor
-        Student student = new Student(id, name);
-        students.add(student);
-        
-        System.out.println("✓ Student '" + name + "' added successfully!");
+
+        students.add(new Student(id, name));
+        System.out.println("Student added!");
     }
 
-    // Register student for courses using StringTokenizer
-    private static void registerForCourses() {
+    static void registerForCourses() {
         System.out.println("\n--- Register for Courses ---");
-        
+
         if (students.isEmpty()) {
-            System.out.println("No students in the system. Please add a student first.");
+            System.out.println("No students. Add a student first.");
             return;
         }
-        
-        // Show available students
+
         listAllStudents();
-        
-        System.out.print("Enter Student ID: ");
-        int studentId = getIntInput();
-        
-        Student student = findStudentById(studentId);
+        System.out.print("Student ID: ");
+        int studentId = getInt();
+
+        Student student = findStudent(studentId);
         if (student == null) {
             System.out.println("Student not found!");
             return;
         }
-        
-        // Show available courses
+
         listAllCourses();
-        
         System.out.println("\nEnter Course IDs separated by commas (e.g., 101,102,103):");
         System.out.print("Course IDs: ");
         String input = scanner.nextLine();
-        
-        // Using StringTokenizer to parse the input
+
+        // StringTokenizer splits the input by commas
         StringTokenizer tokenizer = new StringTokenizer(input, ",");
-        
-        System.out.println("\nRegistering courses...");
-        
+
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken().trim();
-            
+
             try {
-                // Autoboxing happens here: int -> Integer
                 int courseId = Integer.parseInt(token);
-                
-                Course course = findCourseById(courseId);
-                
+                Course course = findCourse(courseId);
+
                 if (course != null) {
-                    System.out.print("Enter grade for " + course.getCourseName());
-                    System.out.print(" (or -1 if not available): ");
-                    double gradeInput = getDoubleInput();
-                    
-                    // Autoboxing: double -> Double
-                    // If -1, we store null instead
+                    System.out.print("Grade for " + course.getCourseName() + " (-1 if none): ");
+                    double gradeInput = getDouble();
+
+                    // Store null if -1, otherwise store the grade
                     Double grade = (gradeInput == -1) ? null : gradeInput;
-                    
-                    // Register using interface method
                     student.registerCourse(course, grade);
-                    System.out.println("  ✓ Registered for: " + course.getCourseName());
-                    
+                    System.out.println("  Registered!");
                 } else {
-                    System.out.println("  ✗ Course ID " + courseId + " not found!");
+                    System.out.println("  Course " + courseId + " not found!");
                 }
-                
             } catch (NumberFormatException e) {
-                System.out.println("  ✗ Invalid course ID: " + token);
+                System.out.println("  Invalid ID: " + token);
             }
         }
-        
-        System.out.println("\nRegistration complete!");
+        System.out.println("Registration complete!");
     }
 
-    // Print report for a student
-    private static void printStudentReport() {
-        System.out.println("\n--- Print Student Report ---");
-        
+    static void printStudentReport() {
+        System.out.println("\n--- Student Report ---");
+
         if (students.isEmpty()) {
-            System.out.println("No students in the system.");
+            System.out.println("No students.");
             return;
         }
-        
+
         listAllStudents();
-        
-        System.out.print("Enter Student ID: ");
-        int studentId = getIntInput();
-        
-        Student student = findStudentById(studentId);
-        
+        System.out.print("Student ID: ");
+        int studentId = getInt();
+
+        Student student = findStudent(studentId);
         if (student != null) {
-            // This method uses StringBuilder internally
             student.printReport();
         } else {
             System.out.println("Student not found!");
         }
     }
 
-    // List all courses
-    private static void listAllCourses() {
-        System.out.println("\n--- Available Courses ---");
+    static void listAllCourses() {
+        System.out.println("\n--- Courses ---");
         System.out.println("ID\tName\t\t\tCredits");
         System.out.println("----------------------------------------");
-        
-        for (Course course : courses) {
-            // Unboxing: Integer -> int happens automatically in print
-            System.out.println(course.getCourseId() + "\t" + 
-                             course.getCourseName() + "\t\t" + 
-                             course.getCreditHours());
+        for (Course c : courses) {
+            System.out.println(c.getCourseId() + "\t" + c.getCourseName() + "\t\t" + c.getCreditHours());
         }
     }
 
-    // List all students
-    private static void listAllStudents() {
-        System.out.println("\n--- All Students ---");
-        
+    static void listAllStudents() {
+        System.out.println("\n--- Students ---");
         if (students.isEmpty()) {
-            System.out.println("No students registered yet.");
+            System.out.println("No students.");
             return;
         }
-        
         System.out.println("ID\tName");
         System.out.println("--------------------");
-        
-        for (Student student : students) {
-            // Unboxing: Integer -> int
-            System.out.println(student.getStudentId() + "\t" + student.getName());
+        for (Student s : students) {
+            System.out.println(s.getStudentId() + "\t" + s.getName());
         }
     }
 
-    // Helper: Find student by ID
-    private static Student findStudentById(int id) {
-        for (Student student : students) {
-            // Unboxing for comparison: Integer -> int
-            if (student.getStudentId() == id) {
-                return student;
-            }
+    static Student findStudent(int id) {
+        for (Student s : students) {
+            if (s.getStudentId() == id)
+                return s;
         }
         return null;
     }
 
-    // Helper: Find course by ID
-    private static Course findCourseById(int id) {
-        for (Course course : courses) {
-            // Unboxing for comparison: Integer -> int
-            if (course.getCourseId() == id) {
-                return course;
-            }
+    static Course findCourse(int id) {
+        for (Course c : courses) {
+            if (c.getCourseId() == id)
+                return c;
         }
         return null;
     }
 
-    // Helper: Get integer input safely
-    private static int getIntInput() {
+    static int getInt() {
         while (!scanner.hasNextInt()) {
-            System.out.print("Please enter a valid number: ");
+            System.out.print("Enter a valid number: ");
             scanner.next();
         }
         int value = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
         return value;
     }
 
-    // Helper: Get double input safely
-    private static double getDoubleInput() {
+    static double getDouble() {
         while (!scanner.hasNextDouble()) {
-            System.out.print("Please enter a valid number: ");
+            System.out.print("Enter a valid number: ");
             scanner.next();
         }
         double value = scanner.nextDouble();
-        scanner.nextLine(); // consume newline
+        scanner.nextLine();
         return value;
     }
 }
