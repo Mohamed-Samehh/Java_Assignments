@@ -1,13 +1,12 @@
 import java.util.*;
 
 public class SimpleWordDictionary {
-    private HashMap<Character, ArrayList<String>> dictionary;
+    private TreeMap<Character, TreeSet<String>> dictionary;
 
     public SimpleWordDictionary() {
-        dictionary = new HashMap<>();
-        // Initialize all letters a-z with empty lists
+        dictionary = new TreeMap<>();
         for (char ch = 'a'; ch <= 'z'; ch++) {
-            dictionary.put(ch, new ArrayList<>());
+            dictionary.put(ch, new TreeSet<>());
         }
     }
 
@@ -18,13 +17,12 @@ public class SimpleWordDictionary {
         char firstLetter = Character.toLowerCase(word.charAt(0));
         if (dictionary.containsKey(firstLetter)) {
             dictionary.get(firstLetter).add(word);
-            Collections.sort(dictionary.get(firstLetter));
         }
     }
 
     public void printAll() {
         for (char ch = 'a'; ch <= 'z'; ch++) {
-            ArrayList<String> words = dictionary.get(ch);
+            TreeSet<String> words = dictionary.get(ch);
             if (!words.isEmpty()) {
                 System.out.println(ch + ": " + words);
             }
@@ -34,7 +32,7 @@ public class SimpleWordDictionary {
     public void printByLetter(char letter) {
         char lowerLetter = Character.toLowerCase(letter);
         if (dictionary.containsKey(lowerLetter)) {
-            ArrayList<String> words = dictionary.get(lowerLetter);
+            TreeSet<String> words = dictionary.get(lowerLetter);
             if (words.isEmpty()) {
                 System.out.println("No words found for letter '" + letter + "'");
             } else {
